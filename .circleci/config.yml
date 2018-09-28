@@ -91,8 +91,8 @@ test: &test
         echo "docker cp ./paper/. openbases:/data/"
         docker cp ./paper/. openbases:/data/
         echo "3. Validating paper and bibliography"
-        echo "docker exec openbases ob-validate --infile /data/paper.md"
-        docker exec openbases ob-validate --infile /data/paper.md "${OPENBASES_VALIDATE_ARGS}"
+        echo "docker exec openbases ob-validate paper --infile /data/paper.md"
+        docker exec openbases ob-validate paper --infile /data/paper.md "${OPENBASES_VALIDATE_ARGS}"
         echo "4. Stopping openbases validator..."
         docker stop openbases
 
