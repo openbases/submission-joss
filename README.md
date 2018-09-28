@@ -1,30 +1,51 @@
-# Open Bases Paper Builder
+# Open Bases JOSS Submission
 
 ![img/preview.png](https://github.com/openbases/builder-pdf/raw/master/img/preview.png)
 
 > Hi friend! :wave:
 
-[![CircleCI](https://circleci.com/gh/openbases/builder-pdf.svg?style=svg)](https://circleci.com/gh/openbases/builder-pdf)
+[![CircleCI](https://circleci.com/gh/openbases/submission-joss.svg?style=svg)](https://circleci.com/gh/openbases/submission-joss)
 
-This is an [openbases](https://openbases.github.io) paper builder
-to use the pre-build [openbases-pdf](https://www.github.com/openbases/openbases-pdf)
-to generate a paper for you! You can:
+This is an [openbases](https://openbases.github.io) template to help you
+to prepare a submission to the [Journal of Open Source Software](http://joss.theoj.org).
 
- 1. Fork the repository to your Github account
- 2. Add your paper (and associated paper files) in the [paper](paper) folder
- 3. Connect to CircleCI to generate a PDF on commits.
+**What does this mean?**
 
-The simple setup will give you PDFs for preview as [Artifacts](https://circleci.com/docs/2.0/artifacts/), and depending
-on your needs to you set up environment variables to build and package your
-paper to send it back to Github pages and preview [like this](https://openbases.github.io/builder-pdf/).
+You can:
+
+ 1. Fork the repository, add your paper, and connect to CircleCI and Github Pages
+ 2. The paper markdown and bibliography are [tested and validated](https://openbases.github.io/openbases-python/html/usage.html#validation)
+ 3. When passing, a rendered preview is available as a [build artifact](https://circleci.com/docs/2.0/artifacts/)
+or live paper [like this](https://openbases.github.io/builder-pdf/).
+
+Then you can submit your paper to JOSS in the usual way, and have confidence that your
+PDF and references have already been tested.
+
+**What is this not?**
+
+ 1. This repository will **not** submit the paper for you. This would be potentially dangerous for the open journal to allow for this kind of programmatic submission.
+ 2. This template will **not** check for "human" elements of your submission (e.g., that your summary is complete). It can only check for programmatic things like length, and formatting.
+
+
+**What does it check?**
+
+Take a look at the [paper criteria](https://github.com/openbases/openbases-python/blob/paper/validation/openbases/main/validate/criteria/paper.yml#L31) for the most updated criteria!
+
+**Could I just run this locally?**
+
+Yes you could! You can use the [openbases/openbases](https://openbases.github.io/openbases-python/html/docker.html#validate) Docker image to validate your markdown and references. This won't generate the rendering. If you want to do
+that, you could just use the [openbases/openbases-pdf](https://www.github.com/openbases/openbases-pdf) 
+builder container to do this.
+
+# Usage
 
 ## 1. Preparation
 
 First fork the repostitory to your account, and clone the fork.
 
 ```bash
-git clone https://www.github.com/<username>/builder-pdf
-git clone git@github.com:<username>/builder-pdf.git
+git clone https://www.github.com/<username>/submission-joss
+git clone git@github.com:<username>/submission-joss.git
 ```
 
 Next, add your paper! You should have a submission (in a folder `paper`) called `paper.md`
@@ -167,6 +188,7 @@ be as simple as changing some of the text output, to adding an additional set of
 deployment options, or more complex like adding entire new steps in the workflow. 
 
 **How do I customize the template?**
+
 The template.html is the same! You can tweak it, completely change it, or throw it out and push something entirely
 different back to Github pages. It's populated with environment variables, and so if you want
 to add variable content this is how to do it. You can add variables to:
@@ -183,14 +205,6 @@ you can change this default in the settings. You can easily add filters
 (or other criteria and actions) to be performed during or after the
 build by editing the `.circleci/config.yml` file in your repository.
 
-
-## Development
-
-Build the container
-
-```bash
-docker build -t openbases/builder-pdf .
-```
 
 ## Credits
 

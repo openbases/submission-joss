@@ -5,7 +5,9 @@
 
 # Variables you can customize
 # OPENBASES_CONTAINER: is the container that will be used, see default section
+# OPENBASES_PYTHON: is the openbases/openbases python container for testing
 # OPENBASES_PAPER_ARGS: are any special arguments to pass to the openbases-pdf container
+# OPENBASES_VALIDATE_ARGS: additional arguments to pass to openbases (ob-validate)
 
 # The following variables are optional and will give you
 # additional deployments / functionality.
@@ -45,12 +47,17 @@ pdfenv: &pdfenv
             OPENBASES_CONTAINER="openbases/openbases-pdf"
         fi
         echo "Open Bases builder is ${OPENBASES_CONTAINER}"
+        if [ ! -n "${OPENBASES_PYTHON:-}" ]; then
+            OPENBASES_PYTHON="openbases/openbases"
+        fi
+        echo "Open Bases python container is ${OPENBASES_PYTHON}"
         # If not set, define PAPER_VERSION (akin to commit version)
         if [ ! -n "${PAPER_VERSION:-}" ]; then
             PAPER_VERSION=$(echo "${CIRCLE_SHA1}" | cut -c1-10)
         fi
         # export to bash environment
         echo "export OPENBASES_CONTAINER=${OPENBASES_CONTAINER}" >> ${BASH_ENV}
+        echo "export OPENBASES_PYTHON=${OPENBASES_PYTHON}" >> ${BASH_ENV}
         echo "export PAPER_VERSION=${PAPER_VERSION}" >> ${BASH_ENV}
         cat ${BASH_ENV}
 
@@ -72,6 +79,23 @@ githubsetup: &githubsetup
         fi
 
 
+test: &test
+    name: use openbases/openbases python docker container to test the paper
+    command: |
+        source ${BASH_ENV}
+        cd /tmp/src
+        echo "1. Starting OpenBases Python Container!"
+        echo "docker run --name openbases --entrypoint bash -dt ${OPENBASES_PYTHON}"
+        docker run --name openbases --entrypoint bash -dt "${OPENBASES_PYTHON}"
+        echo "2. Copying paper stuffs for Open Bases PDF..."
+        echo "docker cp ./paper/. openbases:/data/"
+        docker cp ./paper/. openbases:/data/
+        echo "3. Validating paper and bibliography"
+        echo "docker exec openbases ob-validate --infile /data/paper.md"
+        docker exec openbases ob-validate --infile /data/paper.md "${OPENBASES_VALIDATE_ARGS}"
+        echo "4. Stopping openbases validator..."
+        docker stop openbases
+
 pdf: &pdf
     name: use openbases/openbases-pdf docker container to generate pdf
     command: |
@@ -80,21 +104,23 @@ pdf: &pdf
         echo "1. Starting OpenBases PDF Builder bot!"
         echo "docker run --name openbases-pdf  --entrypoint bash -dt ${OPENBASES_CONTAINER}"
         docker run --name openbases-pdf  --entrypoint bash -dt "${OPENBASES_CONTAINER}"
-        echo "2. Copying paper stuffs for Open Bases PDF..."
+        echo "2. Getting JOSS logo..."
+        wget $(docker run openbases/openbases icons --regexp joss) -O ./paper/logo.png
+        echo "3. Copying paper stuffs for Open Bases PDF..."
         echo "docker cp ./paper/. openbases-pdf:/data/"
         docker cp ./paper/. openbases-pdf:/data/
-        echo "3. Go Robot Go, generate the PDF!"
+        echo "4. Go Robot Go, generate the PDF!"
         echo "docker exec openbases-pdf /bin/bash /code/entrypoint.sh pdf"
         docker exec openbases-pdf /bin/bash /code/entrypoint.sh pdf /data/paper.md "${OPENBASES_PAPER_ARGS}"
-        echo "4. Obtaining finished paper.pdf"
+        echo "5. Obtaining finished paper.pdf"
         mkdir -p /tmp/paper
         echo "docker cp openbases-pdf:/data/. /tmp/paper"
         docker cp openbases-pdf:/data/. /tmp/paper/
-        echo "5. Creating archive."
+        echo "6. Creating archive."
         echo "tar czf paper.tar.gz /tmp/paper"
         tar czf paper.tar.gz /tmp/paper
         mv paper.tar.gz /tmp/paper
-        echo "6. Stopping openbases-pdf..."
+        echo "7. Stopping openbases-pdf..."
         docker stop openbases-pdf
         echo "Contents of /tmp"
         ls /tmp
@@ -122,6 +148,7 @@ jobs:
       - setup_remote_docker
       - checkout
       - run: *pdfenv
+      - run: *test
       - run: *pdf
       - persist_to_workspace:
           root: /tmp
