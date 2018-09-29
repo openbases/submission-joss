@@ -1,6 +1,6 @@
 # Open Bases JOSS Submission
 
-![img/preview.png](https://github.com/openbases/builder-pdf/raw/master/img/preview.png)
+![img/joss.png](img/joss.png)
 
 > Hi friend! :wave:
 
