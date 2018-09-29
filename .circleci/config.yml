@@ -232,8 +232,12 @@ workflows:
       - build:
           filters:
             branches:
-              ignore: gh-pages
+              ignore: 
+                - gh-pages
+                - docs/*
             tags:
+              ignore: 
+                - docs/*
               only: /.*/
 
       # Push the manifest back to Github pages

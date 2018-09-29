@@ -9,33 +9,35 @@
 This is an [openbases](https://openbases.github.io) template to help you
 to prepare a submission to the [Journal of Open Source Software](http://joss.theoj.org).
 
-**What does this mean?**
+## What does this mean?
 
 You can:
 
  1. Fork the repository, add your paper, and connect to CircleCI and Github Pages
  2. The paper markdown and bibliography are [tested and validated](https://openbases.github.io/openbases-python/html/usage.html#validation)
  3. When passing, a rendered preview is available as a [build artifact](https://circleci.com/docs/2.0/artifacts/)
-or live paper [like this](https://openbases.github.io/builder-pdf/).
+or live paper [like this](https://openbases.github.io/submission-joss/).
 
 Then you can submit your paper to JOSS in the usual way, and have confidence that your
 PDF and references have already been tested.
 
-**What is this not?**
+## What is this not?
 
  1. This repository will **not** submit the paper for you. This would be potentially dangerous for the open journal to allow for this kind of programmatic submission.
  2. This template will **not** check for "human" elements of your submission (e.g., that your summary is complete). It can only check for programmatic things like length, and formatting.
 
 
-**What does it check?**
+## What does it check?
 
 Take a look at the [paper criteria](https://github.com/openbases/openbases-python/blob/paper/validation/openbases/main/validate/criteria/paper.yml#L31) for the most updated criteria!
 
-**Could I just run this locally?**
+## Could I just run this locally?
 
-Yes you could! You can use the [openbases/openbases](https://openbases.github.io/openbases-python/html/docker.html#validate) Docker image to validate your markdown and references. This won't generate the rendering. If you want to do
-that, you could just use the [openbases/openbases-pdf](https://www.github.com/openbases/openbases-pdf) 
-builder container to do this.
+Yes you could! You can use the [openbases/openbases](https://openbases.github.io/openbases-python/html/docker.html#validate) Docker image to validate your markdown and references. This won't generate the pdf rendering. 
+If you want to do that, you could just use the [openbases/openbases-pdf](https://www.github.com/openbases/openbases-pdf) 
+builder container. If you want a similar repository template to **just** do that, then you
+want the [openbases/builder-pdf](https://www.github.com/openbases/builder-pdf), which will
+also choose a cute icon instead of the joss logo [like this](https://openbases.github.io/builder-pdf/).
 
 # Usage
 
@@ -57,42 +59,11 @@ paper
    paper.bib
 ```
 
-### Custom Logo
-
-If you want a custom logo, add it as `logo.png`. If not, a beautiful icon
-will be selected from [openbases-icons](https://openbases.github.io/openbases-icons/preview)
-
-```bash
-paper
-   paper.md
-   paper.bib
-   logo.png
-```
-
-
-### Custom Latex Template
-
-The same goes for the latex template! To customize it, just add a "latex.template"
-to the same directory
-
-```
-paper
-    paper.md
-    paper.bib
-    latex.template
-```
-
-If not found, by default, we use the template served 
+Since this is a JOSS submission, we use the template served 
 by [whedon](https://github.com/openjournals/whedon/blob/master/resources/latex.template)
 An example is provided here, in [paper](paper). 
 
-
 ### Step 2. Configuration
-
-Next, we will talk about setting up the services! If you are interested
-specifically in developing the [openbases-pdf](https://www.github.com/openbases/openbases-pdf) 
-doing the heavy lifting to generate the PDF,
-take a look as [his code](https://www.github.com/openbases/openbases-pdf).
 
 The hidden folder [.circleci/config.yml](.circleci/config.yml) has instructions for
 [CircleCI](https://circleci.com/dashboard/) to automatically discover
@@ -101,13 +72,14 @@ also a [template.html](.circleci/template.html) file that is used as a template.
 The first does most of the steps required for build and deploy, including:
 
  1.  clone of the repository with your paper folder
- 2.  build your pdf using the openbsaes-pdf container
- 3.  (optional) generate a container to serve your paper
+ 2.  Validation of your paper.md and paper.bib based on [these criteria](https://github.com/openbases/openbases-python/blob/paper/validation/openbases/main/validate/criteria/paper.yml#L31)
+ 3.  build your pdf using the JOSS templates and logo
  4.  (optional) push back to Github pages
 
-Thus, if you have forked the repository and cloned your fork, you should be able to use
-the files that are pulled. And if you are an advanced user, you could even customize if you
-want.
+If you don't push back to Github pages (meaning you don't specify a Github bot to provide
+a ssh checkout key to do this) you can just as easily view the rendered PDF as a build
+artifact, and the results of testing in the CircleCI interface. The PDF is fun to see
+on Github pages, check out [the example](https://openbases.github.io/submission-joss/) :)
 
 ### Step 3. Generation
 
@@ -164,7 +136,9 @@ Under settings, click on the "Environment Variables" tab. In this
 section, you want to define the following:
 
  *  `GITHUB_USER` and `GITHUB_EMAIL` should be your machine user Github account
+ *  `OPENBASES_VALIDATE_ARGS` are additional arguments to pass to the openbases (ob-validate) [command](https://openbases.github.io/openbases-python/html/docker.html#validate)
  *  `OPENBASES_PAPER_ARGS` should define any additional argument pairs (`--arg1 value1 --bool`) to pass to the [openbases/openbases-pdf container entrypoint](https://github.com/openbases/openbases-pdf/blob/master/entrypoint.sh). This will be passed as followed:
+
 
 ```bash
 /bin/bash entrypoint.sh paper.md "${OPENBASES_PAPER_ARGS}"
@@ -209,3 +183,6 @@ build by editing the `.circleci/config.yml` file in your repository.
 ## Credits
 
  - The beautiful viewer is the slightly modified [ng-pdf-viewer](https://github.com/samrose3/ng-pdf-viewer) from @samrose3.
+
+## Support
+Do you have another question, or need help? Please reach out and [open an issue!](https://www.github.com/openbases/submission-joss/). We are definitely looking for ways to improve the validation, along with generation of the content that you need.
